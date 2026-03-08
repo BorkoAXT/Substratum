@@ -8,7 +8,7 @@ Block::Block()
 {
     x = 0;
     y = 0;
-    size = 25; // cell size
+    size = 25;
 }
 
 void Block::SetPos(Vector2 pos)
@@ -26,7 +26,6 @@ Vector2 Block::GetSize()
 {
     return { (float)size, (float)size };
 }
-
 void Block::SetTexture(Texture2D tex)
 {
     texture = tex;

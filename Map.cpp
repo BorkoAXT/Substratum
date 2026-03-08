@@ -35,13 +35,13 @@ Map::Map(int rows, int cols, int cellSize, Texture2D blockTexture, Texture2D iro
             blocks.push_back(b);
         }
     }
-}
+};
 
 void Map::Draw()
 {
-    for (Block &b : blocks)
+    for (Block &block : blocks)
     {
-        b.Draw();
+        block.Draw();
     }
 }
 

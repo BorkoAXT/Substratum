@@ -12,7 +12,9 @@ add_executable(${PROJECT_NAME} main.cpp
         Map.cpp
         Map.h
         Block.cpp
-        Block.h)
+        Block.h
+        Player.cpp
+        Player.h)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib_static)
 target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/raylib-5.5/src)

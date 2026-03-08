@@ -8,7 +8,7 @@ public:
     Vector2 GetPos();
     Vector2 GetSize();
     void Draw();
-    void SetTexture(Texture2D tex);  // set the shared texture
+    void SetTexture(Texture2D tex);
 
 private:
     int x, y;
