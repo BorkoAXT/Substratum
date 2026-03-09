@@ -4,10 +4,10 @@
 #include "Map.h";
 #include "Player.h"
 
-Player::Player()
+#include "raymath.h"
+
+Player::Player() : position(25 * 80 / 2,80), speed(200)
 {
-    speed = 200;
-    Vector2 position;
 }
 
 void Player::Update()
@@ -18,6 +18,9 @@ void Player::Update()
     if (IsKeyDown(KEY_S)) position.y += speed * dt;
     if (IsKeyDown(KEY_A)) position.x -= speed * dt;
     if (IsKeyDown(KEY_D)) position.x += speed * dt;
+
+    position.x = Clamp(position.x, 5, 200 * 25 - 5);
+    position.y = Clamp(position.y, 5, 80 * 25 - 5);
 }
 void Player::Draw()
 {

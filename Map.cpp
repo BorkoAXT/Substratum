@@ -1,5 +1,5 @@
 #include "Map.h"
-
+#include <fstream>
 #include "thirdparty/PerlinNoise.hpp"
 
 Map::Map(int rows, int cols, int cellSize, Texture2D blockTexture, Texture2D ironTexture, siv::PerlinNoise& noise)
@@ -8,10 +8,11 @@ Map::Map(int rows, int cols, int cellSize, Texture2D blockTexture, Texture2D iro
     this->cols = cols;
     this->cellSize = cellSize;
 
+
     for (int x = 0; x < cols; x++)
     {
         double n = noise.noise1D(x * 0.15);
-        int surface = 7 + (int)(n * 5);
+        int surface = 14 + (int)(n * 10);
 
         for (int y = surface; y < rows; y++)
         {
