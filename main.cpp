@@ -1,69 +1,56 @@
+#include <charconv>
 #include <raylib.h>
+#include <raymath.h>
+#include <fstream>
+#include <string>
 #include "Map.h"
 #include "thirdparty/PerlinNoise.hpp"
 #include "Player.h"
-#include <fstream>
-#include <raymath.h>
-#define CYAN {135, 206, 235}
-#define ROWS 1800
-#define COLS 6400
+#include "Defines.h"
+
 int main()
 {
-    InitWindow(750, 450, "Map Example");
+    SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_WINDOW_RESIZABLE);
+    InitWindow(640, 480, "Mineclone");
 
     siv::PerlinNoise perlinNoise(rand());
 
-    Image dirt = LoadImage("../images/dirtBlock.jpg");
-    Image iron = LoadImage("../images/ironOre.jpg");
 
-    ImageResize(&dirt, 25, 25);
-    ImageResize(&iron, 25, 25);
-
-    Texture2D irontex = LoadTextureFromImage(iron);
-    Texture2D tex = LoadTextureFromImage(dirt);
-
-    UnloadImage(dirt);
-
+    Map map(perlinNoise);
     Player player;
 
-    Camera2D camera = {0};
-    camera.offset = {375, 225};
-    camera.target.x = Clamp(player.position.x, 375, 5000 - 375);
-    camera.target.y = Clamp(player.position.y, 225, 2000 - 225);
+    Camera2D camera = { 0 };
     camera.zoom = 1.0f;
 
-    // std::ofstream stream("../WorldFiles/World.txt");
-    // for (int i = 0; i < ROWS; i++)
-    // {
-    //     for (int j = 0; j < COLS; j++)
-    //     {
-    //         stream << 0;
-    //     }
-    //     stream << std::endl;
-    // }
-
-
-
-    Map map(80, 200, 25, tex, irontex, perlinNoise);
-
     SetTargetFPS(60);
+
     while (!WindowShouldClose())
     {
-        player.Update();
-        camera.target.x = Clamp(player.position.x, 375, 5000 - 375);
-        camera.target.y = Clamp(player.position.y, 225, 2000 - 225);
+        float sw = (float)GetScreenWidth();
+        float sh = (float)GetScreenHeight();
+        Vector2 screenCenter = { sw / 2.0f, sh / 2.0f };
+
+        player.Update(map);
+
+        camera.offset = screenCenter;
+        camera.target.x = Clamp(player.position.x, screenCenter.x, (COLS * 25.0f) - screenCenter.x);
+        camera.target.y = Clamp(player.position.y, screenCenter.y, (ROWS * 25.0f) - screenCenter.y);
+
         BeginDrawing();
-        ClearBackground(CYAN);
-        BeginMode2D(camera);
+            ClearBackground(CYAN);
 
-        map.Draw();
-        player.Draw();
+            BeginMode2D(camera);
+                map.Draw(camera.target);
+                player.Draw();
 
-        EndMode2D();
+                DrawText(TextFormat("X: %.2f", player.position.x), (int)player.position.x + 30, (int)player.position.y - 20, 10, RED);
+                DrawText(TextFormat("Y: %.2f", player.position.y), (int)player.position.x + 30, (int)player.position.y - 10, 10, RED);
+            EndMode2D();
 
+            DrawFPS(10, 10);
         EndDrawing();
     }
-
-    UnloadTexture(tex);
     CloseWindow();
+
+    return 0;
 }

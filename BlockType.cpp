@@ -1,5 +1,0 @@
-enum BlockType
-{
-    Dirt,
-    Iron,
-};

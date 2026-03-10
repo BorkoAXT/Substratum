@@ -1,9 +1,4 @@
 #include "Block.h"
-enum BlockType
-{
-    Dirt,
-    Iron
-};
 Block::Block()
 {
     x = 0;
@@ -26,6 +21,14 @@ Vector2 Block::GetSize()
 {
     return { (float)size, (float)size };
 }
+TileType Block::GetType()
+{
+    return tileType;
+}
+void Block::SetType(TileType type)
+{
+    tileType = type;
+}
 void Block::SetTexture(Texture2D tex)
 {
     texture = tex;
@@ -35,5 +38,6 @@ void Block::Draw()
 {
     DrawTexture(texture, x, y, WHITE);
 }
+
 
 

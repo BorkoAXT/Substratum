@@ -2,18 +2,21 @@
 #include <vector>
 #include "Block.h"
 #include "thirdparty/PerlinNoise.hpp"
+#include "Assets.h"
 
 class Map
 {
 public:
-    Map(int rows, int cols, int cellSize, Texture2D blockTexture, Texture2D ironTexture, siv::PerlinNoise& noise);
+    Map(siv::PerlinNoise& noise);
 
-    void Draw();
+    void Draw(Vector2 pos);
     Block& GetBlock(int row, int col);
+    virtual ~Map();
 
 private:
     int rows;
     int cols;
     int cellSize;
-    std::vector<Block> blocks;
+    std::vector<Texture2D> textures;
+    std::vector<std::vector<Block>> blocks;
 };
