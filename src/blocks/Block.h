@@ -5,6 +5,7 @@ class Block
 {
 public:
     Block();
+    bool IsSolid();
     void SetPos(Vector2 pos);
     Vector2 GetPos();
     Vector2 GetSize();
@@ -15,7 +16,7 @@ public:
     float darknessMeter;
 
 private:
-    int x, y;
+    float x, y;
     int size;
     Texture2D texture;
     TileType tileType = AIR;

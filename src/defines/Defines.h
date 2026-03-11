@@ -14,7 +14,11 @@ enum TileType {
     AIR = 0,
     DIRT = 1,
     GRASS = 2,
-    IRON = 3
+    IRON = 3,
+    TREE_TRUNK = 4,
+    TREE_PART = 5,
+    TREE_LEAVES = 6,
+    TREE_CAP = 7,
 };
 
 #endif

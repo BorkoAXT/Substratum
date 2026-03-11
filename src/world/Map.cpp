@@ -1,90 +1,82 @@
 #include "Map.h"
-#include <fstream>
-#include "defines/Defines.h"
-#include "defines/Assets.h"
-#include "blocks/Block.h"
-#include "../thirdparty/PerlinNoise.hpp"
+#include "NoiseGen.hpp"
+#include "../blocks/Block.h"
+#include "../defines/Defines.h"
+#include "managers/AssetManager.h"
 #include "../thirdparty/raylib-5.5/src/raylib.h"
+#include <vector>
+#include <cmath>
 
-Map::Map(siv::PerlinNoise& noise)
+Map::Map(NoiseGen& noiseGen)
 {
     rows = ROWS;
     cols = COLS;
     cellSize = CELL_SIZE;
 
-    Texture2D dirtTexture = LoadTexture(Assets::DIRT_PATH);
-    Texture2D ironTexture = LoadTexture(Assets::IRON_PATH);
-    Texture2D grassTexture = LoadTexture(Assets::GRASS_PATH);
+    blocks.resize(cols, std::vector<Block>(rows));
 
-    textures.push_back(dirtTexture);
-    textures.push_back(ironTexture);
-    textures.push_back(grassTexture);
-
-blocks.resize(cols, std::vector<Block>(rows));
-
-    std::ofstream stream("world/World.txt");
-
-    for (int y = 0; y < rows; y++)
+    for (int x = 0; x < cols; x++)
     {
-        for (int x = 0; x < cols; x++)
+        int surfaceY = noiseGen.GetSurfaceLevel(x);
+
+        for (int y = 0; y < rows; y++)
         {
-            double n = noise.noise1D(x * 0.15);
-            int surface = 14 + (int)(n * 10);
+            Block b;
+            b.SetPos({ (float)x * cellSize, (float)y * cellSize });
 
-            char tileChar = '0';
-
-            if (y >= surface)
+            if (y > surfaceY)
             {
-                Block b;
-                b.SetPos({ (float)x * cellSize, (float)y * cellSize });
+                float oreChance = noiseGen.GetNoise2D(x, y, 0.1f);
 
-                if (y == surface)
+                if (oreChance > 0.75f)
                 {
-                    b.SetTexture(grassTexture);
-                    b.SetType(GRASS);
-                    tileChar = '2';
+                    b.SetType(IRON);
+                    b.SetTexture(AssetManager::GetTexture("iron"));
                 }
                 else
                 {
-                    double oreNoise = (noise.noise2D(x * 0.1, y * 0.1) + 1.0) / 2.0;
-                    if (oreNoise > 0.75)
-                    {
-                        b.SetTexture(ironTexture);
-                        b.SetType(IRON);
-                        tileChar = '3';
-                    }
-                    else
-                    {
-                        b.SetTexture(dirtTexture);
-                        b.SetType(DIRT);
-                        tileChar = '1';
-                    }
+                    b.SetType(DIRT);
+                    b.SetTexture(AssetManager::GetTexture("dirt"));
                 }
-                blocks[x][y] = b;
+            }
+            else if (y == surfaceY)
+            {
+                b.SetType(GRASS);
+                b.SetTexture(AssetManager::GetTexture("grass"));
+            }
+            else
+            {
+                b.SetType(AIR);
             }
 
-            stream << tileChar;
+            blocks[x][y] = b;
         }
-        stream << "\n";
     }
-    stream.close();
+    for (int x = 0; x < cols; x++)
+    {
+        int surfaceY = GetSurfaceLevel(x);
+
+        if (blocks[x][surfaceY].GetType() == GRASS && (rand() % 10 == 0))
+        {
+            noiseGen.GenerateTree(*this, x);
+        }
+    }
 }
 
 void Map::Draw(Vector2 playerPos)
 {
-    const float screenW = GetScreenWidth();
-    const float screenH = GetScreenHeight();
+    const float screenW = (float)GetScreenWidth();
+    const float screenH = (float)GetScreenHeight();
 
     float worldLeft   = playerPos.x - (screenW / 2.0f);
     float worldRight  = playerPos.x + (screenW / 2.0f);
     float worldTop    = playerPos.y - (screenH / 2.0f);
     float worldBottom = playerPos.y + (screenH / 2.0f);
 
-    int startX = (int)floorf(worldLeft / 25.0f);
-    int endX   = (int)ceilf(worldRight / 25.0f);
-
-    int startY = (int)floorf(worldTop / 25.0f);
-    int endY   = (int)ceilf(worldBottom / 25.0f);
+    int startX = (int)floorf(worldLeft / (float)cellSize);
+    int endX   = (int)ceilf(worldRight / (float)cellSize);
+    int startY = (int)floorf(worldTop / (float)cellSize);
+    int endY   = (int)ceilf(worldBottom / (float)cellSize);
 
     if (startX < 0) startX = 0;
     if (startY < 0) startY = 0;
@@ -93,45 +85,69 @@ void Map::Draw(Vector2 playerPos)
 
     int fadeDistance = 12;
 
-    for (int x = startX; x < endX; x++)
+for (int x = startX; x < endX; x++)
+{
+    int groundY = -1;
+    for (int y = startY; y < endY; y++)
     {
-        for (int y = startY; y < endY; y++)
+        Block& block = blocks[x][y];
+
+        if (groundY == -1 && block.GetType() == GRASS)
+            groundY = y;
+
+        float darkness = 0.0f;
+        if (groundY != -1 && y > groundY)
         {
-            if (blocks[x][y].GetType() != GRASS) continue;
+            darkness = (float)(y - groundY) / (float)fadeDistance;
+            if (darkness > 1.0f) darkness = 1.0f;
+        }
+        block.darknessMeter = darkness;
 
-            for (int i = 0; i < 3; i++)
-            {
-                if (y + i < rows) {
-                    blocks[x][y + i].darknessMeter = 0.0f;
-                    blocks[x][y + i].Draw();
-                }
-            }
-
-            for (int yDark = y + 3; yDark < endY; yDark++)
-            {
-                float blockDepth = (float)(yDark - (y + 3));
-                float darknessMeter = blockDepth / (float)fadeDistance;
-
-                if (darknessMeter > 1.0f) darknessMeter = 1.0f;
-                if (darknessMeter < 0.0f) darknessMeter = 0.0f;
-
-                blocks[x][yDark].darknessMeter = darknessMeter;
-                blocks[x][yDark].Draw();
-            }
-            break;
+        if (block.GetType() != TREE_CAP)
+        {
+            block.Draw();
         }
     }
-
 }
 
-Block& Map::GetBlock(int row, int col)
+for (int x = startX; x < endX; x++)
 {
-   return blocks[row][col];
+    for (int y = startY; y < endY; y++)
+    {
+        if (blocks[x][y].GetType() == TREE_CAP)
+        {
+            blocks[x][y].Draw();
+        }
+    }
 }
+}
+
+int Map::GetSurfaceLevel(int col)
+{
+    if (col < 0) col = 0;
+    if (col >= cols) col = cols - 1;
+
+    for (int y = 0; y < rows; y++)
+    {
+        if (blocks[col][y].GetType() != AIR)
+            return y;
+    }
+
+    return rows - 1;
+}
+
+Block& Map::GetBlock(int col, int row)
+{
+    if (col < 0) col = 0;
+    if (col >= cols) col = cols - 1;
+    if (row < 0) row = 0;
+    if (row >= rows) row = rows - 1;
+
+    return blocks[col][row];
+}
+
 Map::~Map()
 {
-    for (Texture2D& texture : textures)
-    {
-        UnloadTexture(texture);
-    }
+    for (Texture2D& tex : textures)
+        UnloadTexture(tex);
 }

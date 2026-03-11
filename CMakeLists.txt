@@ -11,7 +11,11 @@ file(GLOB_RECURSE SOURCE_FILES
         src/*.cpp
 )
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES}
+        src/world/NoiseGen.cpp
+        src/managers/AssetManager.cpp
+        src/managers/AssetManager.h
+        src/entities/Entity.h)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 

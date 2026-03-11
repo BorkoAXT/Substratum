@@ -1,16 +1,18 @@
 #pragma once
 #include <vector>
 #include "blocks/Block.h"
-#include "../thirdparty/PerlinNoise.hpp"
+#include "../thirdparty/raylib-5.5/src/raylib.h"
+class NoiseGen;
 
 class Map
 {
 public:
-    Map(siv::PerlinNoise& noise);
+    Map(NoiseGen& noiseGen);
 
-    void Draw(Vector2 pos);
+    void Draw(Vector2 playerPos);
+    int GetSurfaceLevel(int col);
     Block& GetBlock(int row, int col);
-    virtual ~Map();
+    ~Map();
 
 private:
     int rows;
