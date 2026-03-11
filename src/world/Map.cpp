@@ -1,7 +1,10 @@
 #include "Map.h"
 #include <fstream>
-#include "Defines.h"
-#include "thirdparty/PerlinNoise.hpp"
+#include "defines/Defines.h"
+#include "defines/Assets.h"
+#include "blocks/Block.h"
+#include "../thirdparty/PerlinNoise.hpp"
+#include "../thirdparty/raylib-5.5/src/raylib.h"
 
 Map::Map(siv::PerlinNoise& noise)
 {
@@ -19,7 +22,7 @@ Map::Map(siv::PerlinNoise& noise)
 
 blocks.resize(cols, std::vector<Block>(rows));
 
-    std::ofstream stream("../WorldFiles/World.txt");
+    std::ofstream stream("world/World.txt");
 
     for (int y = 0; y < rows; y++)
     {
@@ -88,16 +91,37 @@ void Map::Draw(Vector2 playerPos)
     if (endX > cols) endX = cols;
     if (endY > rows) endY = rows;
 
+    int fadeDistance = 12;
+
     for (int x = startX; x < endX; x++)
     {
         for (int y = startY; y < endY; y++)
         {
-            if (blocks[x][y].GetType() != AIR)
+            if (blocks[x][y].GetType() != GRASS) continue;
+
+            for (int i = 0; i < 3; i++)
             {
-                blocks[x][y].Draw();
+                if (y + i < rows) {
+                    blocks[x][y + i].darknessMeter = 0.0f;
+                    blocks[x][y + i].Draw();
+                }
             }
+
+            for (int yDark = y + 3; yDark < endY; yDark++)
+            {
+                float blockDepth = (float)(yDark - (y + 3));
+                float darknessMeter = blockDepth / (float)fadeDistance;
+
+                if (darknessMeter > 1.0f) darknessMeter = 1.0f;
+                if (darknessMeter < 0.0f) darknessMeter = 0.0f;
+
+                blocks[x][yDark].darknessMeter = darknessMeter;
+                blocks[x][yDark].Draw();
+            }
+            break;
         }
     }
+
 }
 
 Block& Map::GetBlock(int row, int col)

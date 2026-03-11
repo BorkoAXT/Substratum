@@ -36,7 +36,8 @@ void Block::SetTexture(Texture2D tex)
 
 void Block::Draw()
 {
-    DrawTexture(texture, x, y, WHITE);
+    unsigned char colorValue = (unsigned char)(255 * (1.0f - darknessMeter));
+    DrawTexture(texture, x, y, {colorValue, colorValue, colorValue, 255});
 }
 
 

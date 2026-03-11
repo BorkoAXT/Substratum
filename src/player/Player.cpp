@@ -1,7 +1,8 @@
 #pragma once
 #include "Player.h"
 #include "raymath.h"
-#include "Map.h"
+#include "world/Map.h"
+#include "defines/Defines.h"
 
 Player::Player() : position(25 * 80 / 2,80), tilePosition(position.x / 25, position.y / 25), speed(200)
 {

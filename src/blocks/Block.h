@@ -1,6 +1,6 @@
 #pragma once
 #include <raylib.h>
-#include "Defines.h"
+#include "defines/Defines.h"
 class Block
 {
 public:
@@ -12,6 +12,7 @@ public:
     void SetTexture(Texture2D tex);
     void SetType(TileType type);
     TileType GetType();
+    float darknessMeter;
 
 private:
     int x, y;

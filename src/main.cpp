@@ -3,10 +3,10 @@
 #include <raymath.h>
 #include <fstream>
 #include <string>
-#include "Map.h"
-#include "thirdparty/PerlinNoise.hpp"
-#include "Player.h"
-#include "Defines.h"
+#include "world/Map.h"
+#include "../thirdparty/PerlinNoise.hpp"
+#include "player/Player.h"
+#include "defines/Defines.h"
 
 int main()
 {

@@ -1,8 +1,7 @@
 #pragma once
 #include <vector>
-#include "Block.h"
-#include "thirdparty/PerlinNoise.hpp"
-#include "Assets.h"
+#include "blocks/Block.h"
+#include "../thirdparty/PerlinNoise.hpp"
 
 class Map
 {
