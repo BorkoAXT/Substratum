@@ -50,7 +50,11 @@ Block NoiseGen::GenerateBlock(int x, int y, float scale, float threshold, Textur
 }
 void NoiseGen::GenerateTree(Map& map, int xSurface)
 {
+    if (xSurface <= 1 || xSurface >= COLS - 1) return;
+
     int sY = GetSurfaceLevel(xSurface);
+
+    if (map.GetBlock(xSurface, sY).GetType() == AIR) return;
 
     map.GetBlock(xSurface, sY - 1).SetType(TREE_TRUNK);
     map.GetBlock(xSurface, sY - 1).SetTexture(AssetManager::GetTexture("tree_trunk"));
@@ -69,6 +73,35 @@ void NoiseGen::GenerateTree(Map& map, int xSurface)
 
     map.GetBlock(xSurface, sY - 4).SetType(TREE_CAP);
     map.GetBlock(xSurface, sY - 4).SetTexture(AssetManager::GetTexture("tree_cap"));
+}
+
+void NoiseGen::GenerateCaves(Map& map)
+{
+    float caveScale = 0.05f;
+
+    float caveThreshold = 0.7f;
+
+    for (int x = 0; x < COLS; x++)
+    {
+        int surface = GetSurfaceLevel(x);
+
+        for (int y = 0; y < ROWS; y++)
+        {
+            float n = GetNoise2D(x, y, caveScale);
+
+            if (y > surface + 5 && n > caveThreshold)
+            {
+                map.GetBlock(x, y).SetType(AIR);
+            }
+            else if (y >= surface && y <= surface + 5 && n > 0.8f)
+            {
+                map.GetBlock(x, y).SetType(AIR);
+
+                if (y > 0 && map.GetBlock(x, y - 1).GetType() == GRASS)
+                    map.GetBlock(x, y - 1).SetType(AIR);
+            }
+        }
+    }
 }
 
 std::vector<Block> NoiseGen::GenerateRow(int y, int width, float scale, const std::vector<Texture2D>& textures)

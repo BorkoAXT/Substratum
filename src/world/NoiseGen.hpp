@@ -28,6 +28,8 @@ public:
 
     void GenerateTree(Map& map, int xSurface);
 
+    void GenerateCaves(Map& map);
+
 
 private:
     siv::PerlinNoise noise;

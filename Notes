@@ -3,7 +3,7 @@
 # Added the textures.
 # Added the terrain generation.
 # Added the player and camera.
-Total: 1,5 hours.
+Total: 1.5 hours.
 
 3/9/2026 -  BULGARIAN TIME
 
@@ -21,4 +21,15 @@ Total: 1,5 hours.
 # Stopped using the awful Image class.
 # Added Grass on the surface blocks.
 # Added some debugging tool tips.
+Total: 5.5 hours.
 
+3/11/2026 - BULGARIAN TIME
+
+# New Tree Assets: Added textures for trunks, layered leaves, and tree caps.
+# Layered Rendering: Built a two-pass draw system. This puts tree caps on top of everything else.
+# Large Sprite Support: Fixed offsets for the 60x60 cap. It now centers perfectly on the 25x25 trunk.
+# Ghost Collisions: Added IsSolid() logic. The player can now walk through trees.
+# Culling Fix: Added vertical padding to the screen check. Tall trees no longer flicker at the screen edge.
+# Code Cleanup: Refactored AssetManager keys to match the new tree parts.
+# Added Caves: Caves now spawn underground and sometimes on the surface. No background texture for caves for now.
+Total: 6 hours.

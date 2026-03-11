@@ -40,6 +40,10 @@ TileType Block::GetType()
 void Block::SetType(TileType type)
 {
     tileType = type;
+    if (type == AIR)
+    {
+        texture.id = {0};
+    }
 }
 void Block::SetTexture(Texture2D tex)
 {

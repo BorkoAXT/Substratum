@@ -52,13 +52,18 @@ Map::Map(NoiseGen& noiseGen)
             blocks[x][y] = b;
         }
     }
+    noiseGen.GenerateCaves(*this);
+
     for (int x = 0; x < cols; x++)
     {
         int surfaceY = GetSurfaceLevel(x);
 
-        if (blocks[x][surfaceY].GetType() == GRASS && (rand() % 10 == 0))
+        if (blocks[x][surfaceY].GetType() == GRASS)
         {
-            noiseGen.GenerateTree(*this, x);
+            if (rand() % 10 == 0)
+            {
+                noiseGen.GenerateTree(*this, x);
+            }
         }
     }
 }
