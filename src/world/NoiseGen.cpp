@@ -38,7 +38,6 @@ Block NoiseGen::GenerateBlock(int x, int y, float scale, float threshold, Textur
 {
     Block b;
     b.SetPos({ (float)x * CELL_SIZE, (float)y * CELL_SIZE });
-
     float n = GetNoise2D(x, y, scale);
     if (n > threshold) {
         b.SetType(type);
@@ -46,16 +45,13 @@ Block NoiseGen::GenerateBlock(int x, int y, float scale, float threshold, Textur
     } else {
         b.SetType(DIRT);
     }
-
     return b;
 }
-void NoiseGen::GenerateTree(Map& map, int xSurface)
+
+void NoiseGen::GenerateTree(Map& map, int xSurface, int surfaceY)
 {
-    if (xSurface <= 1 || xSurface >= COLS - 1) return;
-
-    int sY = GetSurfaceLevel(xSurface);
-
-    if (map.GetBlock(xSurface, sY).GetType() == AIR) return;
+    if (xSurface <= 1 || xSurface >= COLS - 2) return;
+    int sY = surfaceY;
 
     map.GetBlock(xSurface, sY - 1).SetType(TREE_TRUNK);
     map.GetBlock(xSurface, sY - 1).SetTexture(AssetManager::GetTexture("tree_trunk"));
@@ -79,63 +75,68 @@ void NoiseGen::GenerateTree(Map& map, int xSurface)
 void NoiseGen::GenerateCaves(Map& map)
 {
     float caveScale = 0.05f;
-
-    float caveThreshold = 0.7f;
-
+    float caveThreshold = 0.8f;
     for (int x = 0; x < COLS; x++)
     {
         int surface = GetSurfaceLevel(x);
-
         for (int y = 0; y < ROWS; y++)
         {
             float n = GetNoise2D(x, y, caveScale);
-
             if (y > surface + 5 && n > caveThreshold)
             {
-                map.GetBlock(x, y).SetTexture(AssetManager::GetTexture("stone_background"));
-                map.GetBlock(x, y).SetType(BACKGROUND);
+                map.GetBlock(x, y).SetType(AIR);
             }
             else if (y >= surface && y <= surface + 5 && n > 0.8f)
             {
-                map.GetBlock(x, y).SetTexture(AssetManager::GetTexture("stone_background"));
-                map.GetBlock(x, y).SetType(BACKGROUND);
-
-                if (y > 0 && map.GetBlock(x, y - 1).GetType() == GRASS)
-                    map.GetBlock(x, y).SetTexture(AssetManager::GetTexture("stone_background"));
-                map.GetBlock(x, y).SetType(BACKGROUND);
+                map.GetBlock(x, y).SetType(AIR);
             }
         }
     }
 }
 
-std::vector<Block> NoiseGen::GenerateRow(int y, int width, float scale, const std::vector<Texture2D>& textures)
+std::vector<Block> NoiseGen::GenerateRow(int y, int width, float scale)
 {
     std::vector<Block> rowBlocks;
     rowBlocks.reserve(width);
 
     for (int x = 0; x < width; x++) {
         Block b;
-
         int surface = GetSurfaceLevel(x);
+        b.SetPos({ (float)x * CELL_SIZE, (float)y * CELL_SIZE });
         if (y >= surface) {
-            if (y == surface) {
+            if (y == surface)
+            {
                 b.SetType(GRASS);
-                b.SetTexture(textures[2]);
-            } else {
+                b.SetTexture(AssetManager::GetTexture("grass"));
+            }
+            else
+            {
                 float oreNoise = GetNoise2D(x, y, scale);
-                if (oreNoise > 0.75f) {
+                if (oreNoise > 0.75f)
+                {
                     b.SetType(IRON);
-                    b.SetTexture(textures[1]);
-                } else {
-                    b.SetType(DIRT);
-                    b.SetTexture(textures[0]);
+                    b.SetTexture(AssetManager::GetTexture("iron"));
+                }
+                else
+                {
+                    if (y > surface + 5)
+                    {
+                        b.SetType(STONE);
+                        b.SetTexture(AssetManager::GetTexture("stone"));
+                    }
+                    else
+                    {
+                        b.SetType(DIRT);
+                        b.SetTexture(AssetManager::GetTexture("dirt"));
+                    }
                 }
             }
-            b.SetPos({ (float)x * CELL_SIZE, (float)y * CELL_SIZE });
         }
-
+        else
+        {
+            b.SetType(AIR);
+        }
         rowBlocks.push_back(b);
     }
-
     return rowBlocks;
 }

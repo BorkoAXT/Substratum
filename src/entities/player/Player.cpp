@@ -9,7 +9,10 @@ Player::Player(Map& map, float spawnX) : speed(500)
     position.y = (surfaceY - 3) * CELL_SIZE;
     tilePosition = { position.x / CELL_SIZE, position.y / CELL_SIZE };
 }
-
+void Player::SetCamera(Camera2D* cam)
+{
+    camera = cam;
+}
 bool Player::CanMoveTo(Vector2 newPos, Map& map)
 {
     int left   = (int)((newPos.x - 10) / CELL_SIZE);
@@ -34,6 +37,20 @@ void Player::Update(Map& map)
     if (IsKeyDown(KEY_S)) move.y += speed * dt;
     if (IsKeyDown(KEY_A)) move.x -= speed * dt;
     if (IsKeyDown(KEY_D)) move.x += speed * dt;
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
+        Vector2 mousePos = GetMousePosition();
+        Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
+
+        int col = static_cast<int>(worldMouse.x / CELL_SIZE);
+        int row = static_cast<int>(worldMouse.y / CELL_SIZE);
+
+        if (col >= 0 && col < COLS && row >= 0 && row < ROWS)
+        {
+           map.GetBlock(col, row).Hit();
+        }
+    }
 
     Vector2 nextPosX = { position.x + move.x, position.y };
     if (CanMoveTo(nextPosX, map))

@@ -1,6 +1,6 @@
 #include "Block.h"
 Block::Block()
-    : x(0), y(0), size(25), tileType(AIR), darknessMeter(0.0f)
+    : x(0), y(0), size(25), tileType(AIR), darknessMeter(0.0f), durability(3)
 {
     texture = {0};
 }
@@ -50,6 +50,16 @@ void Block::SetTexture(Texture2D tex)
     texture = tex;
 }
 
+void Block::Hit()
+{
+    durability--;
+    if (durability == 0)
+    {
+        texture = {0};
+        tileType = AIR;
+    }
+}
+
 
 
 void Block::Draw()
@@ -82,5 +92,6 @@ void Block::Draw()
         DrawTexture(texture, (int)x, (int)y, tint);
     }
 }
+
 
 

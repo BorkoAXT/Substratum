@@ -11,15 +11,16 @@
 #define CELL_SIZE 25
 
 enum TileType {
-    AIR = 0,
-    DIRT = 1,
-    GRASS = 2,
-    IRON = 3,
-    TREE_TRUNK = 4,
-    TREE_PART = 5,
-    TREE_LEAVES = 6,
-    TREE_CAP = 7,
-    BACKGROUND = 8,
+    AIR,
+    DIRT,
+    GRASS,
+    IRON,
+    STONE,
+    TREE_TRUNK,
+    TREE_PART,
+    TREE_LEAVES,
+    TREE_CAP,
+    BACKGROUND
 };
 
 #endif

@@ -10,5 +10,5 @@ namespace Assets {
     const char* const WOOD_SECOND_LEAVES_PATH = "../assets/textures/trees/treeLeavesSecond.png";
     const char* const WOOD_THIRD_LEAVES_PATH = "../assets/textures/trees/treeLeavesThird.png";
     const char* const WOOD_CAP = "../assets/textures/trees/treeCap.png";
-    const char* const STONE_BACKGROUND = "../assets/textures/backgrounds/stoneBackground.png";
+    const char* const STONE = "../assets/textures/stoneBlock.png";
 }

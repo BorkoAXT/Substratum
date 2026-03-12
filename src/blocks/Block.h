@@ -12,8 +12,10 @@ public:
     void Draw();
     void SetTexture(Texture2D tex);
     void SetType(TileType type);
+    void Hit();
     TileType GetType();
     float darknessMeter;
+    int durability;
 
 private:
     float x, y;

@@ -33,3 +33,13 @@ Total: 5.5 hours.
 # Code Cleanup: Refactored AssetManager keys to match the new tree parts.
 # Added Caves: Caves now spawn underground and sometimes on the surface. No background texture for caves for now.
 Total: 6 hours.
+
+3/12/2026 - BULGARIAN TIME
+
+# New Stone Asset: Added a texture for stone.
+# Breaking: Added the ability to break blocks. For now blocks start with 3 durability.
+# Inventory: Added a simple inventory.
+# Collisions: Removed collisions from trees.
+# Structuring: Changed the generation from map.cpp to be entirely in the noisegen.cpp.
+# Project files: Added raygui as a library.
+Total: 5.5 hours.

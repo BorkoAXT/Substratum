@@ -13,8 +13,8 @@ void AssetManager::LoadAssets()
     textures["tree_trunk"] = LoadTexture(Assets::WOOD_TRUNK_PATH);
     textures["tree_part2"] = LoadTexture(Assets::WOOD_SECOND_PATH);
     textures["tree_part3"] = LoadTexture(Assets::WOOD_THIRD_PATH);
-    // textures["tree_leaves_second"] = LoadTexture(Assets::WOOD_SECOND_LEAVES_PATH);
-    // textures["tree_leaves_third"]  = LoadTexture(Assets::WOOD_THIRD_LEAVES_PATH);
+     textures["tree_leaves_second"] = LoadTexture(Assets::WOOD_SECOND_LEAVES_PATH);
+     textures["tree_leaves_third"]  = LoadTexture(Assets::WOOD_THIRD_LEAVES_PATH);
 
     Image image = LoadImage(Assets::WOOD_CAP);
     ImageResize(&image, 60, 60);
@@ -22,7 +22,7 @@ void AssetManager::LoadAssets()
 
     textures["tree_cap"] = LoadTextureFromImage(image);
 
-    textures["stone_background"] = LoadTexture(Assets::STONE_BACKGROUND);
+    textures["stone"] = LoadTexture(Assets::STONE);
 
     // sounds["mine"] = LoadSound(Assets::MINE_SOUND);
     // sounds["place"] = LoadSound(Assets::PLACE_SOUND);
