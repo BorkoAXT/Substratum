@@ -10,7 +10,6 @@ void AssetManager::LoadAssets()
     textures["dirt"]  = LoadTexture(Assets::DIRT_PATH);
     textures["iron"]  = LoadTexture(Assets::IRON_PATH);
     textures["grass"] = LoadTexture(Assets::GRASS_PATH);
-
     textures["tree_trunk"] = LoadTexture(Assets::WOOD_TRUNK_PATH);
     textures["tree_part2"] = LoadTexture(Assets::WOOD_SECOND_PATH);
     textures["tree_part3"] = LoadTexture(Assets::WOOD_THIRD_PATH);
@@ -22,6 +21,8 @@ void AssetManager::LoadAssets()
     // textures["tree_cap"] = LoadTexture(Assets::WOOD_CAP);
 
     textures["tree_cap"] = LoadTextureFromImage(image);
+
+    textures["stone_background"] = LoadTexture(Assets::STONE_BACKGROUND);
 
     // sounds["mine"] = LoadSound(Assets::MINE_SOUND);
     // sounds["place"] = LoadSound(Assets::PLACE_SOUND);

@@ -6,7 +6,7 @@ Player::Player(Map& map, float spawnX) : speed(500)
 {
     int surfaceY = map.GetSurfaceLevel((int)(spawnX / CELL_SIZE));
     position.x = spawnX;
-    position.y = (surfaceY - 1) * CELL_SIZE;
+    position.y = (surfaceY - 3) * CELL_SIZE;
     tilePosition = { position.x / CELL_SIZE, position.y / CELL_SIZE };
 }
 

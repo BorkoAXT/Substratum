@@ -66,7 +66,9 @@ void Block::Draw()
     };
 
     if (texture.id == 0) return;
-
+    if (tileType == BACKGROUND) {
+        DrawTexture(texture, (int)x, (int)y, {255, 255, 255, 127});
+    }
     if (tileType == TREE_CAP)
     {
         int drawX = (int)x - 15;

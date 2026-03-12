@@ -1,6 +1,7 @@
 #include "NoiseGen.hpp"
 #include <chrono>
 #include "Map.h"
+#include "defines/Assets.h"
 #include "managers/AssetManager.h"
 
 NoiseGen::NoiseGen(uint32_t seed)
@@ -91,14 +92,17 @@ void NoiseGen::GenerateCaves(Map& map)
 
             if (y > surface + 5 && n > caveThreshold)
             {
-                map.GetBlock(x, y).SetType(AIR);
+                map.GetBlock(x, y).SetTexture(AssetManager::GetTexture("stone_background"));
+                map.GetBlock(x, y).SetType(BACKGROUND);
             }
             else if (y >= surface && y <= surface + 5 && n > 0.8f)
             {
-                map.GetBlock(x, y).SetType(AIR);
+                map.GetBlock(x, y).SetTexture(AssetManager::GetTexture("stone_background"));
+                map.GetBlock(x, y).SetType(BACKGROUND);
 
                 if (y > 0 && map.GetBlock(x, y - 1).GetType() == GRASS)
-                    map.GetBlock(x, y - 1).SetType(AIR);
+                    map.GetBlock(x, y).SetTexture(AssetManager::GetTexture("stone_background"));
+                map.GetBlock(x, y).SetType(BACKGROUND);
             }
         }
     }

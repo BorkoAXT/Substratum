@@ -19,6 +19,7 @@ enum TileType {
     TREE_PART = 5,
     TREE_LEAVES = 6,
     TREE_CAP = 7,
+    BACKGROUND = 8,
 };
 
 #endif
