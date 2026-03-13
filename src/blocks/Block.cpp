@@ -1,24 +1,32 @@
 #include "Block.h"
 #include <unordered_map>
+#include <algorithm>
+
 Block::Block()
-    : x(0), y(0), size(25), tileType(AIR), darknessMeter(0.0f), durability(3)
+    : x(0), y(0), size(25), darknessMeter(0.0f), durability(3)
 {
-    texture = {0};
 }
+
 bool Block::IsSolid()
 {
-    if (tileType == AIR) return false;
+    if (layers.empty()) return false;
 
-    if (tileType == TREE_TRUNK ||
-        tileType == TREE_PART ||
-        tileType == TREE_LEAVES ||
-        tileType == TREE_CAP)
+    for (const auto& layer : layers)
     {
-        return false;
+        if (layer.type == AIR ||
+            layer.type == TREE_TRUNK ||
+            layer.type == TREE_PART ||
+            layer.type == TREE_LEAVES ||
+            layer.type == TREE_CAP ||
+            layer.type == BACKGROUND)
+        {
+            continue;
+        }
+        return true;
     }
-
-    return true;
+    return false;
 }
+
 void Block::SetPos(Vector2 pos)
 {
     x = pos.x;
@@ -34,19 +42,28 @@ Vector2 Block::GetSize()
 {
     return { (float)size, (float)size };
 }
-TileType Block::GetType()
+
+TileType Block::GetTopType()
 {
-    return tileType;
+    if (layers.empty()) return AIR;
+    return layers.back().type;
 }
-void Block::SetType(TileType type)
+
+void Block::AddLayer(TileType type, Texture2D tex)
 {
-    tileType = type;
-    if (type == AIR)
-    {
-        texture.id = {0};
-    }
+    layers.push_back({ type, tex, GetPriority(type) });
+
+    std::sort(layers.begin(), layers.end(), [](const BlockLayer& a, const BlockLayer& b) {
+        return a.zIndex < b.zIndex;
+    });
 }
-void Block::SetTypeFromItem(ItemID item)
+
+void Block::ClearAll()
+{
+    layers.clear();
+}
+
+void Block::SetTypeFromItem(ItemID item, Texture2D tex)
 {
     static const std::unordered_map<ItemID, TileType> itemToBlock = {
         { ITEM_NONE, AIR },
@@ -56,59 +73,62 @@ void Block::SetTypeFromItem(ItemID item)
     };
 
     auto it = itemToBlock.find(item);
-    if (it != itemToBlock.end())
-        SetType(it->second);
-    else
-        SetType(AIR);
-}
+    TileType type = (it != itemToBlock.end()) ? it->second : AIR;
 
-void Block::SetTexture(Texture2D tex)
-{
-    texture = tex;
-}
-
-void Block::Hit()
-{
-    durability--;
-    if (durability == 0)
+    if (type == AIR)
     {
-        texture = {0};
-        tileType = AIR;
+        ClearAll();
+    }
+    else
+    {
+        AddLayer(type, tex);
     }
 }
 
+ItemID Block::Hit()
+{
+    if (layers.empty()) return ITEM_NONE;
 
+    durability--;
+    if (durability <= 0)
+    {
+        TileType type = layers.back().type;
+        layers.pop_back();
+        durability = 3;
+
+        if (type == DIRT) return ITEM_DIRT;
+        if (type == STONE) return ITEM_STONE;
+        if (type == IRON) return ITEM_IRON;
+        if (type == GRASS) return ITEM_DIRT;
+
+    }
+    return ITEM_NONE;
+}
+int Block::GetPriority(TileType type)
+{
+    if (type == BACKGROUND) return 0;
+    if (type == DIRT || type == STONE || type == IRON || type == GRASS) return 1;
+    if (type == TREE_TRUNK || type == TREE_PART) return 2;
+    if (type == TREE_LEAVES) return 3;
+    if (type == TREE_CAP) return 4;
+    return 1;
+}
 
 void Block::Draw()
 {
+    if (layers.empty()) return;
+
     float brightness = 1.0f - darknessMeter;
-    if (brightness < 0.0f) brightness = 0.0f;
-    if (brightness > 1.0f) brightness = 1.0f;
+    Color tint = { (unsigned char)(255 * brightness), (unsigned char)(255 * brightness), (unsigned char)(255 * brightness), 255 };
 
-    Color tint = {
-        (unsigned char)(255 * brightness),
-        (unsigned char)(255 * brightness),
-        (unsigned char)(255 * brightness),
-        255
-    };
-
-    if (texture.id == 0) return;
-    if (tileType == BACKGROUND) {
-        DrawTexture(texture, (int)x, (int)y, {255, 255, 255, 127});
-    }
-    if (tileType == TREE_CAP)
+    for (const auto& layer : layers)
     {
-        int drawX = (int)x - 15;
+        Color layerColor = tint;
+        if (layer.type == BACKGROUND) layerColor.a = 140;
 
-        int drawY = (int)y - 10;
-
-        DrawTexture(texture, drawX, drawY, tint);
-    }
-    else
-    {
-        DrawTexture(texture, (int)x, (int)y, tint);
+        if (layer.type == TREE_CAP)
+            DrawTexture(layer.texture, (int)x - 15, (int)y - 10, layerColor);
+        else
+            DrawTexture(layer.texture, (int)x, (int)y, layerColor);
     }
 }
-
-
-

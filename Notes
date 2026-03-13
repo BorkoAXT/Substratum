@@ -43,3 +43,9 @@ Total: 6 hours.
 # Structuring: Changed the generation from map.cpp to be entirely in the noisegen.cpp.
 # Project files: Added raygui as a library.
 Total: 5.5 hours.
+
+3/13/2026 - BULGARIAN TIME
+
+# Inventory: Added inventory count, Added inventory animations
+# Pickup: Can now destroy and place blocks, destroyed blocks drop pickups which can be picked up.
+Total: 4.5 hours.

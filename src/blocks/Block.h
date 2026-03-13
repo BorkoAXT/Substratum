@@ -1,6 +1,14 @@
 #pragma once
 #include <raylib.h>
+#include <vector>
 #include "defines/Defines.h"
+
+struct BlockLayer {
+    TileType type;
+    Texture2D texture;
+    int zIndex;
+};
+
 class Block
 {
 public:
@@ -10,17 +18,20 @@ public:
     Vector2 GetPos();
     Vector2 GetSize();
     void Draw();
-    void SetTexture(Texture2D tex);
-    void SetType(TileType type);
-    void SetTypeFromItem(ItemID item);
-    void Hit();
-    TileType GetType();
+
+    void AddLayer(TileType type, Texture2D tex);
+    void SetTypeFromItem(ItemID item, Texture2D tex);
+    ItemID Hit();
+    void ClearAll();
+
+    TileType GetTopType();
+
     float darknessMeter;
     int durability;
 
 private:
     float x, y;
     int size;
-    Texture2D texture;
-    TileType tileType = AIR;
+    std::vector<BlockLayer> layers;
+    int GetPriority(TileType tileType);
 };

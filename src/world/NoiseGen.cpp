@@ -39,11 +39,14 @@ Block NoiseGen::GenerateBlock(int x, int y, float scale, float threshold, Textur
     Block b;
     b.SetPos({ (float)x * CELL_SIZE, (float)y * CELL_SIZE });
     float n = GetNoise2D(x, y, scale);
-    if (n > threshold) {
-        b.SetType(type);
-        b.SetTexture(texture);
-    } else {
-        b.SetType(DIRT);
+
+    if (n > threshold)
+    {
+        b.AddLayer(type, texture);
+    }
+    else
+    {
+        b.AddLayer(DIRT, AssetManager::GetTexture("dirt"));
     }
     return b;
 }
@@ -53,23 +56,12 @@ void NoiseGen::GenerateTree(Map& map, int xSurface, int surfaceY)
     if (xSurface <= 1 || xSurface >= COLS - 2) return;
     int sY = surfaceY;
 
-    map.GetBlock(xSurface, sY - 1).SetType(TREE_TRUNK);
-    map.GetBlock(xSurface, sY - 1).SetTexture(AssetManager::GetTexture("tree_trunk"));
-
-    map.GetBlock(xSurface, sY - 2).SetType(TREE_PART);
-    map.GetBlock(xSurface, sY - 2).SetTexture(AssetManager::GetTexture("tree_part2"));
-
-    map.GetBlock(xSurface, sY - 3).SetType(TREE_PART);
-    map.GetBlock(xSurface, sY - 3).SetTexture(AssetManager::GetTexture("tree_part3"));
-
-    map.GetBlock(xSurface + 1, sY - 2).SetType(TREE_LEAVES);
-    map.GetBlock(xSurface + 1, sY - 2).SetTexture(AssetManager::GetTexture("tree_leaves_second"));
-
-    map.GetBlock(xSurface - 1, sY - 3).SetType(TREE_LEAVES);
-    map.GetBlock(xSurface - 1, sY - 3).SetTexture(AssetManager::GetTexture("tree_leaves_third"));
-
-    map.GetBlock(xSurface, sY - 4).SetType(TREE_CAP);
-    map.GetBlock(xSurface, sY - 4).SetTexture(AssetManager::GetTexture("tree_cap"));
+    map.GetBlock(xSurface, sY - 1).AddLayer(TREE_TRUNK, AssetManager::GetTexture("tree_trunk"));
+    map.GetBlock(xSurface, sY - 2).AddLayer(TREE_PART, AssetManager::GetTexture("tree_part2"));
+    map.GetBlock(xSurface, sY - 3).AddLayer(TREE_PART, AssetManager::GetTexture("tree_part3"));
+    // map.GetBlock(xSurface + 1, sY - 2).AddLayer(TREE_LEAVES, AssetManager::GetTexture("tree_leaves"));
+    // map.GetBlock(xSurface - 1, sY - 3).AddLayer(TREE_LEAVES, AssetManager::GetTexture("tree_leaves"));
+    map.GetBlock(xSurface, sY - 4).AddLayer(TREE_CAP, AssetManager::GetTexture("tree_cap"));
 }
 
 void NoiseGen::GenerateCaves(Map& map)
@@ -82,13 +74,9 @@ void NoiseGen::GenerateCaves(Map& map)
         for (int y = 0; y < ROWS; y++)
         {
             float n = GetNoise2D(x, y, caveScale);
-            if (y > surface + 5 && n > caveThreshold)
+            if (y >= surface && n > 0.8f)
             {
-                map.GetBlock(x, y).SetType(AIR);
-            }
-            else if (y >= surface && y <= surface + 5 && n > 0.8f)
-            {
-                map.GetBlock(x, y).SetType(AIR);
+                map.GetBlock(x, y).ClearAll();
             }
         }
     }
@@ -103,38 +91,31 @@ std::vector<Block> NoiseGen::GenerateRow(int y, int width, float scale)
         Block b;
         int surface = GetSurfaceLevel(x);
         b.SetPos({ (float)x * CELL_SIZE, (float)y * CELL_SIZE });
+
         if (y >= surface) {
             if (y == surface)
             {
-                b.SetType(GRASS);
-                b.SetTexture(AssetManager::GetTexture("grass"));
+                b.AddLayer(GRASS, AssetManager::GetTexture("grass"));
             }
             else
             {
                 float oreNoise = GetNoise2D(x, y, scale);
                 if (oreNoise > 0.75f)
                 {
-                    b.SetType(IRON);
-                    b.SetTexture(AssetManager::GetTexture("iron"));
+                    b.AddLayer(IRON, AssetManager::GetTexture("iron"));
                 }
                 else
                 {
                     if (y > surface + 5)
                     {
-                        b.SetType(STONE);
-                        b.SetTexture(AssetManager::GetTexture("stone"));
+                        b.AddLayer(STONE, AssetManager::GetTexture("stone"));
                     }
                     else
                     {
-                        b.SetType(DIRT);
-                        b.SetTexture(AssetManager::GetTexture("dirt"));
+                        b.AddLayer(DIRT, AssetManager::GetTexture("dirt"));
                     }
                 }
             }
-        }
-        else
-        {
-            b.SetType(AIR);
         }
         rowBlocks.push_back(b);
     }

@@ -38,6 +38,7 @@ int main()
         camera.target.y = Clamp(player.position.y, screenCenter.y, (ROWS * CELL_SIZE) - screenCenter.y);
 
         player.Update(map);
+        map.UpdateItems();
 
 
         BeginDrawing();
@@ -78,10 +79,10 @@ int main()
             DrawText(TextFormat("Block solid: %s", block.IsSolid() ? "Yes" : "No"),
                      10, 60, 10, RED);
 
-            DrawText(TextFormat("Texture ptr: %p", (void*)block.GetType()),
+            DrawText(TextFormat("Texture ptr: %p", (void*)block.GetTopType()),
                      10, 70, 10, RED);
 
-            if (!block.GetType() == AIR)
+            if (!block.GetTopType() == AIR)
             {
                 DrawText(TextFormat("Block durability: %d", block.durability),
                      10, 80, 10, RED);

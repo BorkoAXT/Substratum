@@ -3,28 +3,57 @@
 #include "../managers/AssetManager.h"
 
 Inventory::Inventory()
-    : currentIndex(0), prevIndex(0),
-      targetIndex(0), direction(0), isVisible(false), transitionProgress(1.0f)
+    : currentIndex(0), prevIndex(0), targetIndex(0), direction(0), isVisible(false), transitionProgress(1.0f)
 {
-    items.resize(SLOT_COUNT, ITEM_NONE);
+    items.resize(3, { ITEM_NONE, 0 });
 }
 
 bool Inventory::AddItem(ItemID itemID)
 {
-    for (int i = 0; i < items.size(); i++)
+    if (itemID == ITEM_NONE) return false;
+
+    for (int i = 0; i < (int)items.size(); i++)
     {
-        if (items[i] == ITEM_NONE)
+        if (items[i].id == itemID)
         {
-            items[i] = itemID;
+            items[i].count++;
+            return true;
+        }
+    }
+
+    for (int i = 0; i < (int)items.size(); i++)
+    {
+        if (items[i].id == ITEM_NONE)
+        {
+            items[i].id = itemID;
+            items[i].count = 1;
             return true;
         }
     }
     return false;
 }
-ItemID Inventory::GetCurrentItem()
+
+InventorySlot Inventory::GetCurrentItem()
 {
+    if (items.empty()) return { ITEM_NONE, 0 };
     return items[currentIndex];
 }
+void Inventory::RemoveCurrentItem()
+{
+    if (items.empty()) return;
+
+    if (items[currentIndex].id != ITEM_NONE)
+    {
+        items[currentIndex].count--;
+
+        if (items[currentIndex].count <= 0)
+        {
+            items[currentIndex].id = ITEM_NONE;
+            items[currentIndex].count = 0;
+        }
+    }
+}
+
 void Inventory::Update()
 {
     if (IsKeyPressed(KEY_TAB)) isVisible = !isVisible;
@@ -36,14 +65,14 @@ void Inventory::Update()
         {
             direction = -1;
             prevIndex = currentIndex;
-            targetIndex = (currentIndex - 1 + items.size()) % items.size();
+            targetIndex = (currentIndex - 1 + (int)items.size()) % (int)items.size();
             transitionProgress = 0.0f;
         }
         else if (IsKeyPressed(KEY_E))
         {
             direction = 1;
             prevIndex = currentIndex;
-            targetIndex = (currentIndex + 1) % items.size();
+            targetIndex = (currentIndex + 1) % (int)items.size();
             transitionProgress = 0.0f;
         }
     }
@@ -60,7 +89,8 @@ void Inventory::Update()
     }
 }
 
-void Inventory::Draw(Vector2 playerPos) {
+void Inventory::Draw(Vector2 playerPos)
+{
     if (!isVisible) return;
 
     const float p = transitionProgress;
@@ -72,16 +102,9 @@ void Inventory::Draw(Vector2 playerPos) {
     const float gap = 20.0f;
     const float step = smallSize + gap;
 
-    int itemCount = 0;
-    for (ItemID id : items) if (id != ITEM_NONE) itemCount++;
-
-    int slotsToDraw = (itemCount == 0) ? 3 : (itemCount == 1) ? 1 : (itemCount == 2) ? 2 : 3;
-    int start = -slotsToDraw / 2;
-    int end = start + slotsToDraw - 1;
-
     for (int i = -1; i <= 1; i++)
     {
-        int slotIdx = (currentIndex + i + items.size()) % items.size();
+        int slotIdx = (currentIndex + i + (int)items.size()) % (int)items.size();
 
         float posX = i * step - direction * step * p;
         float distFromCenter = fabsf(posX);
@@ -91,18 +114,22 @@ void Inventory::Draw(Vector2 playerPos) {
         Rectangle slot = { xCenter + posX - size / 2, yCenter - size / 2, size, size };
         DrawRectangleRec(slot, Fade(BLACK, 0.6f * opacity));
 
-        ItemID itemId = items[slotIdx];
-        if (itemId != ITEM_NONE)
+        InventorySlot currentSlot = items[slotIdx];
+        if (currentSlot.id != ITEM_NONE)
         {
-            Texture2D tex = AssetManager::GetTexture(itemId);
+            Texture2D tex = AssetManager::GetTexture(currentSlot.id);
             if (tex.id != 0)
             {
-                float scale = size / (float)tex.width;
+                float scale = (size * 0.8f) / (float)tex.width;
                 Rectangle src = { 0, 0, (float)tex.width, (float)tex.height };
-                Rectangle dest = { slot.x, slot.y, tex.width * scale, tex.height * scale };
+                Rectangle dest = { slot.x + size * 0.1f, slot.y + size * 0.1f, tex.width * scale, tex.height * scale };
                 DrawTexturePro(tex, src, dest, {0,0}, 0.0f, Fade(WHITE, opacity));
+
+                if (currentSlot.count > 1)
+                {
+                    DrawText(TextFormat("%d", currentSlot.count), (int)slot.x + 2, (int)slot.y + (int)size - 12, 10, Fade(RAYWHITE, opacity));
+                }
             }
         }
     }
 }
-

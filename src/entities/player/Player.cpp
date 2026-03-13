@@ -9,14 +9,13 @@ Player::Player(Map& map, float spawnX) : speed(500)
     position.x = spawnX;
     position.y = (surfaceY - 3) * CELL_SIZE;
     tilePosition = { position.x / CELL_SIZE, position.y / CELL_SIZE };
-    inventory.AddItem(ITEM_STONE);
-    inventory.AddItem(ITEM_IRON);
-    inventory.AddItem(ITEM_DIRT);
 }
+
 void Player::SetCamera(Camera2D* cam)
 {
     camera = cam;
 }
+
 bool Player::CanMoveTo(Vector2 newPos, Map& map)
 {
     int left   = (int)((newPos.x - 10) / CELL_SIZE);
@@ -46,48 +45,57 @@ void Player::Update(Map& map)
     {
         Vector2 mousePos = GetMousePosition();
         Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
-
         int col = static_cast<int>(worldMouse.x / CELL_SIZE);
         int row = static_cast<int>(worldMouse.y / CELL_SIZE);
 
         if (col >= 0 && col < COLS && row >= 0 && row < ROWS)
         {
-           map.GetBlock(col, row).Hit();
+            ItemID droppedItem = map.GetBlock(col, row).Hit();
+            if (droppedItem != ITEM_NONE)
+            {
+                Vector2 spawnPos = { (float)col * CELL_SIZE + 12, (float)row * CELL_SIZE + 12 };
+                map.SpawnItem(droppedItem, spawnPos);
+            }
         }
     }
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
     {
-        ItemID itemId = inventory.GetCurrentItem();
+        InventorySlot slot = inventory.GetCurrentItem();
         Vector2 mousePos = GetMousePosition();
         Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
-
         int col = static_cast<int>(worldMouse.x / CELL_SIZE);
         int row = static_cast<int>(worldMouse.y / CELL_SIZE);
 
         if (col >= 0 && col < COLS && row >= 0 && row < ROWS)
         {
             Block& block = map.GetBlock(col, row);
-            if (block.GetType() == AIR && itemId != ITEM_NONE)
+            if (!block.IsSolid() && slot.id != ITEM_NONE)
             {
-                block.SetTexture(AssetManager::GetTexture(itemId));
-                block.SetTypeFromItem(itemId);
+                    Texture2D tex = AssetManager::GetTexture(slot.id);
+                    block.SetTypeFromItem(slot.id, tex);
+                    inventory.RemoveCurrentItem();
             }
         }
     }
 
+    std::vector<ItemID> pickedUp = map.CollectItems(this->position, 40.0f);
+    for (ItemID id : pickedUp)
+    {
+        inventory.AddItem(id);
+    }
+
     Vector2 nextPosX = { position.x + move.x, position.y };
-    if (CanMoveTo(nextPosX, map))
-        position.x = nextPosX.x;
+    if (CanMoveTo(nextPosX, map)) position.x = nextPosX.x;
 
     Vector2 nextPosY = { position.x, position.y + move.y };
-    if (CanMoveTo(nextPosY, map))
-        position.y = nextPosY.y;
+    if (CanMoveTo(nextPosY, map)) position.y = nextPosY.y;
 
     tilePosition.x = position.x / CELL_SIZE;
     tilePosition.y = position.y / CELL_SIZE;
 
     position.x = Clamp(position.x, 10, COLS * CELL_SIZE - 10);
     position.y = Clamp(position.y, 10, ROWS * CELL_SIZE - 10);
+
     inventory.Update();
 }
 

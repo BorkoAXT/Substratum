@@ -1,5 +1,4 @@
 #include <entities/Entity.h>
-
 #include "inventory/Inventory.h"
 #include "world/Map.h"
 class Player : public Entity

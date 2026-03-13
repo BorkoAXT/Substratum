@@ -13,8 +13,10 @@ void AssetManager::LoadAssets()
     textures["tree_trunk"] = LoadTexture(Assets::WOOD_TRUNK_PATH);
     textures["tree_part2"] = LoadTexture(Assets::WOOD_SECOND_PATH);
     textures["tree_part3"] = LoadTexture(Assets::WOOD_THIRD_PATH);
-     textures["tree_leaves_second"] = LoadTexture(Assets::WOOD_SECOND_LEAVES_PATH);
-     textures["tree_leaves_third"]  = LoadTexture(Assets::WOOD_THIRD_LEAVES_PATH);
+Image leavesImage = LoadImage(Assets::WOOD_LEAVES_PATH);
+    ImageResize(&leavesImage, 20, 20);
+
+     textures["tree_leaves"] = LoadTextureFromImage(leavesImage);
 
     Image image = LoadImage(Assets::WOOD_CAP);
     ImageResize(&image, 60, 60);

@@ -7,8 +7,7 @@ namespace Assets {
     const char* const WOOD_TRUNK_PATH = "../assets/textures/trees/treeTrunk.png";
     const char* const WOOD_SECOND_PATH = "../assets/textures/trees/treeSecond.png";
     const char* const WOOD_THIRD_PATH = "../assets/textures/trees/treeThird.png";
-    const char* const WOOD_SECOND_LEAVES_PATH = "../assets/textures/trees/treeLeavesSecond.png";
-    const char* const WOOD_THIRD_LEAVES_PATH = "../assets/textures/trees/treeLeavesThird.png";
+    const char* const WOOD_LEAVES_PATH = "../assets/textures/trees/treeLeaves.png";
     const char* const WOOD_CAP = "../assets/textures/trees/treeCap.png";
     const char* const STONE = "../assets/textures/stoneBlock.png";
 }
