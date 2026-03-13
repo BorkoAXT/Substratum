@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "raymath.h"
 #include "defines/Defines.h"
+#include "managers/AssetManager.h"
 
 Player::Player(Map& map, float spawnX) : speed(500)
 {
@@ -8,6 +9,9 @@ Player::Player(Map& map, float spawnX) : speed(500)
     position.x = spawnX;
     position.y = (surfaceY - 3) * CELL_SIZE;
     tilePosition = { position.x / CELL_SIZE, position.y / CELL_SIZE };
+    inventory.AddItem(ITEM_STONE);
+    inventory.AddItem(ITEM_IRON);
+    inventory.AddItem(ITEM_DIRT);
 }
 void Player::SetCamera(Camera2D* cam)
 {
@@ -51,6 +55,25 @@ void Player::Update(Map& map)
            map.GetBlock(col, row).Hit();
         }
     }
+    if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+    {
+        ItemID itemId = inventory.GetCurrentItem();
+        Vector2 mousePos = GetMousePosition();
+        Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
+
+        int col = static_cast<int>(worldMouse.x / CELL_SIZE);
+        int row = static_cast<int>(worldMouse.y / CELL_SIZE);
+
+        if (col >= 0 && col < COLS && row >= 0 && row < ROWS)
+        {
+            Block& block = map.GetBlock(col, row);
+            if (block.GetType() == AIR && itemId != ITEM_NONE)
+            {
+                block.SetTexture(AssetManager::GetTexture(itemId));
+                block.SetTypeFromItem(itemId);
+            }
+        }
+    }
 
     Vector2 nextPosX = { position.x + move.x, position.y };
     if (CanMoveTo(nextPosX, map))
@@ -65,9 +88,11 @@ void Player::Update(Map& map)
 
     position.x = Clamp(position.x, 10, COLS * CELL_SIZE - 10);
     position.y = Clamp(position.y, 10, ROWS * CELL_SIZE - 10);
+    inventory.Update();
 }
 
 void Player::Draw()
 {
     DrawRectangle(position.x - 10, position.y - 10, 20, 20, RED);
+    inventory.Draw(position);
 }

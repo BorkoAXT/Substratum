@@ -45,6 +45,25 @@ Texture2D AssetManager::GetTexture(const std::string& name)
     else
         return Texture2D{}; // empty texture to prevent crash
 }
+Texture2D AssetManager::GetTexture(ItemID itemId)
+{
+    static const std::unordered_map<ItemID, std::string> itemToTextureKey =
+    {
+        { ITEM_DIRT,       "dirt" },
+        { ITEM_STONE,      "stone" },
+        { ITEM_IRON,       "iron" },
+    };
+
+    auto it = itemToTextureKey.find(itemId);
+    if (it != itemToTextureKey.end())
+    {
+        return GetTexture(it->second);
+    }
+    else
+    {
+        return Texture2D{};
+    }
+}
 
 // Sound AssetManager::GetSound(const std::string& name)
 // {

@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <raylib.h>
+#include "defines/Defines.h"
 
 class AssetManager
 {
@@ -10,6 +11,7 @@ public:
     static void UnloadAssets();
 
     static Texture2D GetTexture(const std::string& name);
+    static Texture2D GetTexture(ItemID itemId);
     static Sound GetSound(const std::string& name);
     static Music GetMusic(const std::string& name);
 

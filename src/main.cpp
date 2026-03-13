@@ -19,7 +19,6 @@ int main()
     NoiseGen noiseGen(0);
     Map map(noiseGen);
     Player player(map, 100.0f);
-    Inventory inventory;
 
     Camera2D camera = { 0 };
     camera.zoom = 1.0f;
@@ -39,7 +38,6 @@ int main()
         camera.target.y = Clamp(player.position.y, screenCenter.y, (ROWS * CELL_SIZE) - screenCenter.y);
 
         player.Update(map);
-        inventory.Update();
 
 
         BeginDrawing();
@@ -54,7 +52,6 @@ int main()
         BeginMode2D(camera);
         map.Draw(camera.target);
         player.Draw();
-        inventory.Draw(player.position);
 
 
         EndMode2D();

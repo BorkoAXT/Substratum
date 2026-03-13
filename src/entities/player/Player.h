@@ -1,4 +1,6 @@
 #include <entities/Entity.h>
+
+#include "inventory/Inventory.h"
 #include "world/Map.h"
 class Player : public Entity
 {
@@ -10,6 +12,7 @@ public:
 
     float speed;
     Vector2 tilePosition;
+    Inventory inventory;
 
 private:
     bool CanMoveTo(Vector2 newPos, Map& map);

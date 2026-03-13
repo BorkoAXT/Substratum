@@ -10,6 +10,8 @@
 #define COLS 400
 #define CELL_SIZE 25
 
+#define SLOT_COUNT 3
+
 enum TileType {
     AIR,
     DIRT,
@@ -23,4 +25,11 @@ enum TileType {
     BACKGROUND
 };
 
+enum ItemID
+{
+    ITEM_NONE = -1,
+    ITEM_DIRT = 0,
+    ITEM_STONE = 1,
+    ITEM_IRON = 2
+};
 #endif

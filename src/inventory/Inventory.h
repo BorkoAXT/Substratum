@@ -2,6 +2,8 @@
 #include <raylib.h>
 #include <vector>
 
+#include "defines/Defines.h"
+
 
 class Inventory
 {
@@ -10,12 +12,11 @@ public:
 
     void Update();
     void Draw(Vector2 pos);
-
-    void Next();
-    void Previous();
+    ItemID GetCurrentItem();
+    bool AddItem(ItemID itemID);
 
 private:
-    std::vector<int> items;
+    std::vector<ItemID> items;
 
     int currentIndex;
     bool isVisible;

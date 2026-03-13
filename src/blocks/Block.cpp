@@ -1,4 +1,5 @@
 #include "Block.h"
+#include <unordered_map>
 Block::Block()
     : x(0), y(0), size(25), tileType(AIR), darknessMeter(0.0f), durability(3)
 {
@@ -45,6 +46,22 @@ void Block::SetType(TileType type)
         texture.id = {0};
     }
 }
+void Block::SetTypeFromItem(ItemID item)
+{
+    static const std::unordered_map<ItemID, TileType> itemToBlock = {
+        { ITEM_NONE, AIR },
+        { ITEM_DIRT, DIRT },
+        { ITEM_STONE, STONE },
+        { ITEM_IRON, IRON }
+    };
+
+    auto it = itemToBlock.find(item);
+    if (it != itemToBlock.end())
+        SetType(it->second);
+    else
+        SetType(AIR);
+}
+
 void Block::SetTexture(Texture2D tex)
 {
     texture = tex;
