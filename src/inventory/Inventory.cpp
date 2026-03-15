@@ -6,6 +6,7 @@ Inventory::Inventory()
     : currentIndex(0), prevIndex(0), targetIndex(0), direction(0), isVisible(false), transitionProgress(1.0f)
 {
     items.resize(3, { ITEM_NONE, 0 });
+    items.push_back({ ITEM_PICKAXE, 1 });
 }
 
 bool Inventory::AddItem(ItemID itemID)

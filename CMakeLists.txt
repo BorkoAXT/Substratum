@@ -19,7 +19,10 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES}
         src/entities/Entity.h
         src/inventory/inventory.cpp
         src/inventory/inventory.h
-        src/entities/item/ItemEntity.h)
+        src/entities/item/ItemEntity.h
+        src/rendering/Render.cpp
+        src/rendering/Render.h
+        src/world/FallingTree.h)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 # target_link_libraries(${PROJECT_NAME} PRIVATE raygui)

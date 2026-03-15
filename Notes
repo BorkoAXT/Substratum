@@ -49,3 +49,14 @@ Total: 5.5 hours.
 # Inventory: Added inventory count, Added inventory animations
 # Pickup: Can now destroy and place blocks, destroyed blocks drop pickups which can be picked up.
 Total: 4.5 hours.
+
+3/14/2026 - BULGARIAN TIME
+
+# Introduced a pickaxe that the player can swing and launch themselves toward the mouse (Like thor).
+# Implemented random tree generation (leaves still need fixing).
+# Added small leaves and flowers on the ground for decoration.
+# Added underground ores: ruby, sapphire, and coal.
+# Reworked player physics to support pickaxe swinging mechanics.
+# Destroying blocks now generates pickups that automatically add to the inventory, including proper item counts.
+# Plan to rework the lightning system, as it is currently bugged.
+Total: 9 hours.

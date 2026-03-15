@@ -22,7 +22,14 @@ enum TileType {
     TREE_PART,
     TREE_LEAVES,
     TREE_CAP,
-    BACKGROUND
+    BACKGROUND,
+    RUBY,
+    SAPPHIRE,
+    COAL,
+    YELLOW_FLOWER,
+    GRASS_LEAVES_1,
+    GRASS_LEAVES_2,
+    WOOD,
 };
 
 enum ItemID
@@ -30,6 +37,8 @@ enum ItemID
     ITEM_NONE = -1,
     ITEM_DIRT = 0,
     ITEM_STONE = 1,
-    ITEM_IRON = 2
+    ITEM_IRON = 2,
+    ITEM_PICKAXE = 3,
+    ITEM_WOOD = 4,
 };
 #endif

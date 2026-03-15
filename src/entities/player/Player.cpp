@@ -3,11 +3,14 @@
 #include "defines/Defines.h"
 #include "managers/AssetManager.h"
 
-Player::Player(Map& map, float spawnX) : speed(500)
+Player::Player(Map& map, float spawnX) : speed(220)
 {
     int surfaceY = map.GetSurfaceLevel((int)(spawnX / CELL_SIZE));
     position.x = spawnX;
     position.y = (surfaceY - 3) * CELL_SIZE;
+    velocity = {0,0};
+    swingAngle = -140.0f;
+    swingSpeed = 0.0f;
     tilePosition = { position.x / CELL_SIZE, position.y / CELL_SIZE };
 }
 
@@ -34,61 +37,137 @@ bool Player::CanMoveTo(Vector2 newPos, Map& map)
 void Player::Update(Map& map)
 {
     float dt = GetFrameTime();
-    Vector2 move = { 0, 0 };
 
-    if (IsKeyDown(KEY_W)) move.y -= speed * dt;
-    if (IsKeyDown(KEY_S)) move.y += speed * dt;
-    if (IsKeyDown(KEY_A)) move.x -= speed * dt;
-    if (IsKeyDown(KEY_D)) move.x += speed * dt;
+    float accel = 1800.0f;
+    float friction = 10.0f;
+    float gravity = 1800.0f;
+    float jumpForce = 520.0f;
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    map.UpdateItems();
+
+    if (IsKeyDown(KEY_A)) velocity.x -= accel * dt;
+    if (IsKeyDown(KEY_D)) velocity.x += accel * dt;
+
+    velocity.x -= velocity.x * friction * dt;
+    velocity.y += gravity * dt;
+
+    Vector2 below = {position.x, position.y + 11};
+    bool grounded = !CanMoveTo(below, map);
+
+    if (grounded && IsKeyPressed(KEY_SPACE))
+    {
+        velocity.y = -jumpForce;
+    }
+
+    if (inventory.GetCurrentItem().id == ITEM_PICKAXE)
+    {
+        const float minAngle = -140.0f;
+        const float maxAngle = 140.0f;
+        const float accelSwing = 420.0f;
+        const float maxSpeed = 900.0f;
+
+        if (IsKeyDown(KEY_T))
+        {
+            swingSpeed += accelSwing * dt;
+
+            if (swingSpeed > maxSpeed)
+                swingSpeed = maxSpeed;
+
+            swingAngle += swingSpeed * dt;
+
+            if (swingAngle > maxAngle)
+                swingAngle = minAngle;
+
+            pickaxeRotation = swingAngle;
+        }
+
+        if (IsKeyReleased(KEY_T))
+        {
+            Vector2 mousePos = GetMousePosition();
+            Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
+
+            Vector2 dir = Vector2Normalize(Vector2Subtract(worldMouse, position));
+
+            float throwForce = 2000.0f + swingSpeed * 3.0f;
+            velocity.x += dir.x * throwForce;
+            velocity.y += dir.y * throwForce;
+
+            swingSpeed = 0.0f;
+            swingAngle = minAngle;
+            pickaxeRotation = 0.0f;
+        }
+    }
+
+    Vector2 move = { velocity.x * dt, velocity.y * dt };
+
+    Vector2 nextPosX = { position.x + move.x, position.y };
+
+    if (CanMoveTo(nextPosX, map))
+        position.x = nextPosX.x;
+    else
+        velocity.x = 0;
+
+    Vector2 nextPosY = { position.x, position.y + move.y };
+
+    if (CanMoveTo(nextPosY, map))
+        position.y = nextPosY.y;
+    else
+    {
+        if (velocity.y > 0) velocity.y = 0;
+    }
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && !isMining)
     {
         Vector2 mousePos = GetMousePosition();
         Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
-        int col = static_cast<int>(worldMouse.x / CELL_SIZE);
-        int row = static_cast<int>(worldMouse.y / CELL_SIZE);
+
+        int col = (int)(worldMouse.x / CELL_SIZE);
+        int row = (int)(worldMouse.y / CELL_SIZE);
 
         if (col >= 0 && col < COLS && row >= 0 && row < ROWS)
         {
-            ItemID droppedItem = map.GetBlock(col, row).Hit();
-            if (droppedItem != ITEM_NONE)
+            Vector2 blockCenter = {
+                (float)col * CELL_SIZE + CELL_SIZE / 2,
+                (float)row * CELL_SIZE + CELL_SIZE / 2
+            };
+
+            float dist = Vector2Distance(position, blockCenter);
+
+            if (dist < 80)
             {
-                Vector2 spawnPos = { (float)col * CELL_SIZE + 12, (float)row * CELL_SIZE + 12 };
-                map.SpawnItem(droppedItem, spawnPos);
+                isMining = true;
+                miningTimer = 0.0f;
+                miningTarget = blockCenter;
             }
         }
     }
+
     if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
     {
         InventorySlot slot = inventory.GetCurrentItem();
         Vector2 mousePos = GetMousePosition();
         Vector2 worldMouse = GetScreenToWorld2D(mousePos, *camera);
-        int col = static_cast<int>(worldMouse.x / CELL_SIZE);
-        int row = static_cast<int>(worldMouse.y / CELL_SIZE);
+
+        int col = (int)(worldMouse.x / CELL_SIZE);
+        int row = (int)(worldMouse.y / CELL_SIZE);
 
         if (col >= 0 && col < COLS && row >= 0 && row < ROWS)
         {
             Block& block = map.GetBlock(col, row);
-            if (!block.IsSolid() && slot.id != ITEM_NONE)
+
+            if (!block.IsSolid() && slot.id != ITEM_NONE && slot.id != ITEM_PICKAXE)
             {
-                    Texture2D tex = AssetManager::GetTexture(slot.id);
-                    block.SetTypeFromItem(slot.id, tex);
-                    inventory.RemoveCurrentItem();
+                Texture2D tex = AssetManager::GetTexture(slot.id);
+                block.SetTypeFromItem(slot.id, tex);
+                inventory.RemoveCurrentItem();
             }
         }
     }
 
-    std::vector<ItemID> pickedUp = map.CollectItems(this->position, 40.0f);
+    std::vector<ItemID> pickedUp = map.CollectItems(this->position, 60.0f);
+
     for (ItemID id : pickedUp)
-    {
         inventory.AddItem(id);
-    }
-
-    Vector2 nextPosX = { position.x + move.x, position.y };
-    if (CanMoveTo(nextPosX, map)) position.x = nextPosX.x;
-
-    Vector2 nextPosY = { position.x, position.y + move.y };
-    if (CanMoveTo(nextPosY, map)) position.y = nextPosY.y;
 
     tilePosition.x = position.x / CELL_SIZE;
     tilePosition.y = position.y / CELL_SIZE;
@@ -97,10 +176,92 @@ void Player::Update(Map& map)
     position.y = Clamp(position.y, 10, ROWS * CELL_SIZE - 10);
 
     inventory.Update();
+
+    if (isMining)
+    {
+        miningTimer += dt;
+
+        pickaxeRotation = sin(miningTimer * 12.0f) * 70.0f;
+
+        if (miningTimer > 0.25f)
+        {
+            int col = (int)(miningTarget.x / CELL_SIZE);
+            int row = (int)(miningTarget.y / CELL_SIZE);
+
+            Block& block = map.GetBlock(col, row);
+
+            if (block.IsTree())
+            {
+                int r = row;
+
+                while (r >= 0)
+                {
+                    Block& treePart = map.GetBlock(col, r);
+
+                    if (!treePart.IsTree())
+                        break;
+
+                    ItemID droppedItem = ITEM_WOOD;
+
+                    if (droppedItem != ITEM_NONE)
+                    {
+                        Vector2 spawnPos = {
+                            (float)col * CELL_SIZE + CELL_SIZE / 2,
+                            (float)r * CELL_SIZE + CELL_SIZE / 2
+                        };
+
+                        map.SpawnItem(droppedItem, spawnPos);
+                    }
+
+                    treePart.ClearAll();
+
+                    r--;
+                }
+            }
+            else
+            {
+                ItemID droppedItem = block.Hit();
+
+                if (droppedItem != ITEM_NONE)
+                {
+                    Vector2 spawnPos =
+                    {
+                        (float)col * CELL_SIZE + CELL_SIZE / 2,
+                        (float)row * CELL_SIZE + CELL_SIZE / 2
+                    };
+
+                    map.SpawnItem(droppedItem, spawnPos);
+                }
+            }
+
+            isMining = false;
+            pickaxeRotation = 0.0f;
+        }
+    }
 }
 
 void Player::Draw()
 {
     DrawRectangle(position.x - 10, position.y - 10, 20, 20, RED);
+
+    Texture2D tex = AssetManager::GetTexture("pickaxe");
+
+    Rectangle src = {0,0,(float)tex.width,(float)tex.height};
+
+    Rectangle dest =
+    {
+        position.x + 6,
+        position.y - 4,
+        25,
+        25
+    };
+
+    Vector2 origin = {5,20};
+
+    if (inventory.GetCurrentItem().id == ITEM_PICKAXE)
+    {
+        DrawTexturePro(tex, src, dest, origin, pickaxeRotation, WHITE);
+    }
+
     inventory.Draw(position);
 }

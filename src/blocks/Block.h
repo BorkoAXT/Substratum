@@ -14,6 +14,7 @@ class Block
 public:
     Block();
     bool IsSolid();
+    bool IsTree();
     void SetPos(Vector2 pos);
     Vector2 GetPos();
     Vector2 GetSize();
@@ -25,6 +26,8 @@ public:
     void ClearAll();
 
     TileType GetTopType();
+    Texture2D GetTopTexture();
+    void SetLastLayerType(TileType type);
 
     float darknessMeter;
     int durability;

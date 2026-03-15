@@ -18,13 +18,24 @@ Image leavesImage = LoadImage(Assets::WOOD_LEAVES_PATH);
 
      textures["tree_leaves"] = LoadTextureFromImage(leavesImage);
 
-    Image image = LoadImage(Assets::WOOD_CAP);
+    Image image = LoadImage(Assets::WOOD_CAP_PATH);
     ImageResize(&image, 60, 60);
     // textures["tree_cap"] = LoadTexture(Assets::WOOD_CAP);
 
     textures["tree_cap"] = LoadTextureFromImage(image);
 
-    textures["stone"] = LoadTexture(Assets::STONE);
+    textures["stone"] = LoadTexture(Assets::STONE_PATH);
+    textures["pickaxe"] = LoadTexture(Assets::PICKAXE_PATH);
+
+    textures["coal"] = LoadTexture(Assets::COAL_PATH);
+    textures["sapphire"] = LoadTexture(Assets::SAPPHIRE_PATH);
+    textures["ruby"] = LoadTexture(Assets::RUBY_PATH);
+
+    textures["grass_leaves_1"] = LoadTexture(Assets::GRASS_LEAVES_1);
+    textures["grass_leaves_2"] = LoadTexture(Assets::GRASS_LEAVES_2);
+
+    textures["yellow_flower"] = LoadTexture(Assets::YELLOW_FLOWER);
+    textures["wood"] = LoadTexture(Assets::WOOD_PATH);
 
     // sounds["mine"] = LoadSound(Assets::MINE_SOUND);
     // sounds["place"] = LoadSound(Assets::PLACE_SOUND);
@@ -54,6 +65,8 @@ Texture2D AssetManager::GetTexture(ItemID itemId)
         { ITEM_DIRT,       "dirt" },
         { ITEM_STONE,      "stone" },
         { ITEM_IRON,       "iron" },
+        {ITEM_PICKAXE, "pickaxe"},
+        {ITEM_WOOD, "wood"}
     };
 
     auto it = itemToTextureKey.find(itemId);

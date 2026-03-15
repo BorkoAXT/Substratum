@@ -12,6 +12,9 @@ public:
     void Draw(Vector2 playerPos);
     int GetSurfaceLevel(int col);
     Block& GetBlock(int row, int col);
+    int GetTreeHeight(int col, int row);
+    void RemoveTree(int col, int row, int height);
+    void ResolveItemInsideBlock(ItemEntity& item);
     void SpawnItem(ItemID, Vector2 pos);
     void UpdateItems();
     std::vector<ItemID> CollectItems(Vector2 collectorPos, float radius);
@@ -25,5 +28,4 @@ private:
     std::vector<Texture2D> textures;
     std::vector<std::vector<Block>> blocks;
     std::vector<ItemEntity> droppedItems;
-
 };

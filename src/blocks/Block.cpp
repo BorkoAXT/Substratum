@@ -18,12 +18,29 @@ bool Block::IsSolid()
             layer.type == TREE_PART ||
             layer.type == TREE_LEAVES ||
             layer.type == TREE_CAP ||
-            layer.type == BACKGROUND)
+            layer.type == BACKGROUND ||
+            layer.type == GRASS_LEAVES_1 ||
+            layer.type == GRASS_LEAVES_2 ||
+            layer.type == YELLOW_FLOWER)
         {
             continue;
         }
         return true;
     }
+    return false;
+}
+bool Block::IsTree()
+{
+    for (auto& layer : layers)
+    {
+        if (layer.type == TREE_TRUNK ||
+            layer.type == TREE_PART ||
+            layer.type == TREE_CAP)
+        {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -48,7 +65,16 @@ TileType Block::GetTopType()
     if (layers.empty()) return AIR;
     return layers.back().type;
 }
-
+Texture2D Block::GetTopTexture()
+{
+    if (layers.empty()) return {0};
+    return layers.back().texture;
+}
+void Block::SetLastLayerType(TileType type)
+{
+    if (layers.empty()) return;
+    layers.back().type = type;
+}
 void Block::AddLayer(TileType type, Texture2D tex)
 {
     layers.push_back({ type, tex, GetPriority(type) });
@@ -69,7 +95,8 @@ void Block::SetTypeFromItem(ItemID item, Texture2D tex)
         { ITEM_NONE, AIR },
         { ITEM_DIRT, DIRT },
         { ITEM_STONE, STONE },
-        { ITEM_IRON, IRON }
+        { ITEM_IRON, IRON },
+        {ITEM_WOOD, WOOD}
     };
 
     auto it = itemToBlock.find(item);
@@ -100,6 +127,7 @@ ItemID Block::Hit()
         if (type == STONE) return ITEM_STONE;
         if (type == IRON) return ITEM_IRON;
         if (type == GRASS) return ITEM_DIRT;
+        if (type == WOOD) return ITEM_WOOD;
 
     }
     return ITEM_NONE;
