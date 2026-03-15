@@ -60,3 +60,12 @@ Total: 4.5 hours.
 # Destroying blocks now generates pickups that automatically add to the inventory, including proper item counts.
 # Plan to rework the lightning system, as it is currently bugged.
 Total: 9 hours.
+
+3/15/2026 - BULGARIAN TIME
+
+# Fixed the pickaxe not being in the inventory.
+# Added more assets for biomes.
+# Cleaned up the code a bit.
+# Fixed player movement.
+# Added more surface assets like ferns, flowers, etc.
+Total: 14 hours.
