@@ -9,10 +9,12 @@ class Map
 public:
     Map(NoiseGen& noiseGen);
 
-    void Draw(Vector2 playerPos);
     int GetSurfaceLevel(int col);
     Block& GetBlock(int row, int col);
     int GetTreeHeight(int col, int row);
+    int GetRows() const { return rows; }
+    int GetCols() const { return cols; }
+    int GetCellSize() const { return cellSize; }
     void RemoveTree(int col, int row, int height);
     void ResolveItemInsideBlock(ItemEntity& item);
     void SpawnItem(ItemID, Vector2 pos);

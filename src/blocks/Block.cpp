@@ -3,7 +3,7 @@
 #include <algorithm>
 
 Block::Block()
-    : x(0), y(0), size(25), darknessMeter(0.0f), durability(3)
+    : x(0), y(0), size(25), darknessMeter(0.0f), durability(2)
 {
 }
 

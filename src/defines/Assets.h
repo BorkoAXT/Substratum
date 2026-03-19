@@ -17,5 +17,5 @@ namespace Assets {
     const char* const GRASS_LEAVES_1 = "../assets/textures/surfaceGrass/grassLeaves1.png";
     const char* const GRASS_LEAVES_2 = "../assets/textures/surfaceGrass/grassLeaves2.png";
     const char* const YELLOW_FLOWER = "../assets/textures/surfaceGrass/yellowFlower.png";
-    const char* const WOOD_PATH = "../assets/textures/woodBlock.png";
+    const char* const WOOD_PATH = "../assets/textures/woodBlockV2.png";
 }

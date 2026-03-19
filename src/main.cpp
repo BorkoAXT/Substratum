@@ -8,6 +8,7 @@
 #include "entities/player/Player.h"
 #include "defines/Defines.h"
 #include "inventory/Inventory.h"
+#include "rendering/Render.h"
 
 int main()
 {
@@ -51,7 +52,7 @@ int main()
         int mouseRow = static_cast<int>(mouseWorld.y / CELL_SIZE);
 
         BeginMode2D(camera);
-        map.Draw(camera.target);
+        Render::DrawWorld(map, player, camera);
         player.Draw();
 
 

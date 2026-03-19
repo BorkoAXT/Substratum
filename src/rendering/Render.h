@@ -1,16 +1,9 @@
-//
-// Created by BorkoAXT on 3/15/2026.
-//
-
-#ifndef RENDER_H
-#define RENDER_H
-
-
+#pragma once
+#include "world/Map.h"
+#include "entities/player/Player.h"
 
 class Render {
-~Render();
+public:
+    static void DrawWorld(Map& map, Player& player, Camera2D& camera);
+    static void Read();
 };
-
-
-
-#endif //RENDER_H
